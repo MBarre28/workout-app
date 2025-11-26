@@ -1,98 +1,153 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import {
+  Dimensions,
+  Image,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const WhiteLogo = require('../../assets/images/1.png');
 
-export default function HomeScreen() {
+const { width, height } = Dimensions.get('window');
+
+// Responsive utility for scaling font/buttons
+const scale = (size: number) => {
+  if (width >= 1024) return size * 1.2; // iPad Pro, big tablets
+  if (width >= 800) return size * 1.1;  // iPad, large Android tablets
+  if (width < 360) return size * 0.93;  // small phones
+  return size;
+};
+
+const BUTTON_WIDTH = Math.min(width * 0.85, 440);
+const IMAGE_SIZE = Math.min(width * 0.62, 260);
+
+export default function Welcome() {
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    router.push('/auth/register');
+  };
+
+  const handleLogin = () => {
+    router.push('/auth/login');
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <View style={styles.content}>
+        <View style={styles.logoWrapper}>
+          <Image 
+            source={WhiteLogo} 
+            style={styles.logo} 
+            resizeMode="contain"
+          />
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={styles.bottomSection}>
+          <Text style={styles.tagline}> Build muscles, Improve health. </Text>
+
+          <TouchableOpacity
+            style={[styles.primaryButton, { width: BUTTON_WIDTH }]}
+            onPress={handleGetStarted}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.primaryButtonText}>Get Started</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.secondaryButton, { width: BUTTON_WIDTH }]}
+            onPress={handleLogin}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.secondaryButtonText}>Login</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#1E1E1E',
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center', // Full vertical centering for all heights
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0,
+    paddingBottom: scale(20),
+    width: '100%',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  logoWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    maxHeight: Math.max(IMAGE_SIZE + 30, height * 0.35),
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  logo: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    maxWidth: 320,
+    maxHeight: 320,
+  },
+  bottomSection: {
+    width: '100%',
+    alignItems: 'center',
+    paddingBottom: scale(24),
+    marginBottom: scale(12),
+  },
+  tagline: {
+    fontSize: scale(18),
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: scale(28),
+    color: '#E85B03',
+    maxWidth: 400,
+  },
+  primaryButton: {
+    backgroundColor: '#1E1E1E',
+    paddingVertical: scale(15),
+    borderRadius: 28,
+    marginBottom: scale(18),
+    alignItems: 'center',
+    shadowColor: '#1E1E1E',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  primaryButtonText: {
+    color: '#E85B03',
+    backgroundColor: '#ffff',
+    padding: 20,
+    borderRadius: 10,
+    width: 250,
+    textAlign: 'center',
+    fontSize: scale(17),
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: '#E85B03',
+    borderRadius: 10,
+    maxWidth: 250,
+
+
+
+  },
+  secondaryButtonText: {
+    color: '#ffff',
+    fontSize: scale(17),
+    fontWeight: '600',
+    textAlign: 'center',
+    padding: 20,
   },
 });
